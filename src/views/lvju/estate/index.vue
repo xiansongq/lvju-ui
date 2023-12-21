@@ -201,7 +201,7 @@ const handleShowHouse = async(row?: EstateVO)=>{
     // 获取小区id
     var estateid=row?.id;
     // 跳转
-    proxy?.$router.push({path:'estatedhouse',query:{estateid:estateid}});
+    proxy?.$router.push({path:'/houselist',query:{estateid:estateid,name:row?.name,cityid:row?.cityid}});
 
 }
 

@@ -100,31 +100,26 @@ export const constantRoutes: RouteOption[] = [
         component: ()=> import('@/views/lvju/supattch/filetable.vue'),
         name: 'filetable',
         meta:{ title: '文件列表' ,icon:'file'}
-        
-      },
+      }
+    ]
+  },
+  {
+    path:'',
+    // component:()=>import('@/views/lvju/house/index.vue'),
+    component: Layout,
+    // name: 'estatehouse',
+    // meta:{ title: '房源列表',icons:'house'},
+    hidden: true,
+    redirectTo: 'noredirect',
+    children: [
       {
-        path:'lvju/estatedhouse',
-        hidden: true,
-        component:()=>import('@/views/lvju/house/index.vue'),
-        name: 'estatehouse',
-        meta:{ title: '房源列表',icons:'house'}
+        path:'/houselist',
+        component: ()=> import('@/views/lvju/house/index.vue'),
+        name: 'house',
+        meta:{ title: '房源信息' ,icon:'house'}
       }
     ]
   }
-/*   {
-    path:'',
-    component: Layout,
-    hidden: true,
-    redirectTo: 'noredirect',
-    children:[
-      {
-        path:'lvju/estatedhouse',
-        component:()=>import('@/views/lvju/house/index.vue'),
-        name: 'estatehouse',
-        meta:{ title: '房源列表',icons:'house'}
-      }
-    ]
-  } */
 
 ];
 

@@ -54,6 +54,13 @@ export interface HouseVO {
    */
   createTime: string;
 
+  /* 城市名称 */
+
+  cityname:string;
+
+  /* 小区名称 */
+  estatename:string;
+
 }
 
 export interface HouseForm extends BaseEntity {
