@@ -117,6 +117,12 @@ export const constantRoutes: RouteOption[] = [
         component: ()=> import('@/views/lvju/house/index.vue'),
         name: 'house',
         meta:{ title: '房源信息' ,icon:'house'}
+      },
+      {
+        path:"/housefile",
+        component:()=>import('@/views/lvju/hattch/index.vue'),
+        name:'housefile',
+        meta:{ title: '房源附件' ,icon:'file'}
       }
     ]
   }

@@ -57,6 +57,8 @@ const props = defineProps({
     fileType: propTypes.array.def(["doc", "xls", "ppt", "txt", "pdf"]),
     // 是否显示提示
     isShowTip: propTypes.bool.def(true),
+    // 文件上传路径
+    uploadUrl: propTypes.string.def(""),
 });
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
@@ -65,7 +67,7 @@ const number = ref(0);
 const uploadList = ref<any[]>([]);
 
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
-const uploadFileUrl = ref(baseUrl + "/resource/oss/upload"); // 上传文件服务器地址
+const uploadFileUrl = ref(baseUrl + props.uploadUrl); // 上传文件服务器地址
 const headers = ref(globalHeaders());
 
 const fileList = ref<any[]>([]);
@@ -99,10 +101,12 @@ watch(() => props.modelValue, async val => {
         fileList.value = [];
         return [];
     }
+    
 }, { deep: true, immediate: true });
 
 // 上传前校检格式和大小
 const handleBeforeUpload = (file: any) => {
+    console.log(uploadFileUrl)
     // 校检文件类型
     if (props.fileType.length) {
         const fileName = file.name.split('.');
@@ -139,7 +143,9 @@ const handleUploadError = () => {
 // 上传成功回调
 const handleUploadSuccess = (res: any, file: UploadFile) => {
     if (res.code === 200) {
-        uploadList.value.push({ name: res.data.fileName, url: res.data.url, ossId: res.data.ossId });
+        uploadList.value.push({ filename: res.data.filename, filepath: res.data.filepath, filetype: res.data.filetype });
+        // console.log(uploadList.value)
+        // proxy?.$emit("upload-success", uploadList.value);
         uploadedSuccessfully();
     } else {
         number.value--;
@@ -164,7 +170,9 @@ const uploadedSuccessfully = () => {
         fileList.value = fileList.value.filter(f => f.url !== undefined).concat(uploadList.value);
         uploadList.value = [];
         number.value = 0;
+        console.log(fileList.value)
         emit("update:modelValue", listToString(fileList.value));
+        proxy?.$emit("upload-success", fileList.value);
         proxy?.$modal.closeLoading();
     }
 }

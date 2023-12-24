@@ -87,6 +87,9 @@
             <el-tooltip content="查看详细信息" placement="top">
               <el-button link type="primary" icon="reading" @click="handleDetailInfo(scope.row)" v-hasPermi="['lvju:house:remove']"></el-button>
             </el-tooltip>
+            <el-tooltip content="附件管理" placement="top">
+              <el-button link type="primary" icon="files" @click="handleMangFile(scope.row)" v-hasPermi="['lvju:house:remove']"></el-button>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -350,6 +353,14 @@ const handleDelete = async (row?: HouseVO) => {
   await getList();
 };
 
+/* 管理附件按钮 */
+const handleMangFile =async (row?:HouseVO)=>{
+  // 携带房间id 跳转到新的页面
+  const _ids=row?.id;
+  proxy?.$router.push({path:"/housefile",query:{id:_ids}});
+
+};
+
 /** 导出按钮操作 */
 const handleExport = () => {
   proxy?.download(
@@ -368,7 +379,7 @@ onMounted(() => {
   estateid.value = id;
   estatename.value = proxy?.$router.currentRoute.value.query.name;
   cityID.value = proxy?.$router.currentRoute.value.query.cityid;
-  getList();
   getCityList();
+  getList();
 });
 </script>
