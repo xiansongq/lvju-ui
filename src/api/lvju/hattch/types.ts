@@ -1,4 +1,15 @@
-export interface HattchVO {
+
+export interface OssVO extends BaseEntity {
+  ossId: string | number;
+  fileName: string;
+  originalName: string;
+  fileSuffix: string;
+  url: string;
+  createByName: string;
+  service: string;
+}
+
+export interface HattchVO extends OssVO{
   /**
    * id
    */
@@ -9,15 +20,7 @@ export interface HattchVO {
    */
   houseid: string | number;
 
-  /**
-   * 原始名称
-   */
-  name: string;
-
-  /**
-   * 保存路径
-   */
-  path: string;
+  ossId: string | number;
 
   /**
    * 文件类型 0图片 1视频
@@ -34,7 +37,7 @@ export interface HattchVO {
 
 }
 
-export interface HattchForm extends BaseEntity {
+export interface HattchForm extends BaseEntity , OssVO {
   /**
    * id
    */
@@ -45,6 +48,9 @@ export interface HattchForm extends BaseEntity {
    */
   houseid?: string | number;
 
+  /* OOSID */
+
+  ossId?: string | number;
   /**
    * 原始名称
    */
@@ -69,15 +75,12 @@ export interface HattchQuery extends PageQuery {
    */
   houseid?: string | number;
 
-  /**
-   * 原始名称
-   */
-  name?: string;
 
-  /**
-   * 保存路径
-   */
-  path?: string;
+  
+  /* OOSID */
+
+  ossId?: string | number;
+
 
   /**
    * 文件类型 0图片 1视频

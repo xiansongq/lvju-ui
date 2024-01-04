@@ -67,7 +67,7 @@ const number = ref(0);
 const uploadList = ref<any[]>([]);
 
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
-const uploadFileUrl = ref(baseUrl + props.uploadUrl); // 上传文件服务器地址
+const uploadFileUrl = ref(baseUrl + "/resource/oss/upload"); // 上传文件服务器地址
 const headers = ref(globalHeaders());
 
 const fileList = ref<any[]>([]);
@@ -143,15 +143,17 @@ const handleUploadError = () => {
 // 上传成功回调
 const handleUploadSuccess = (res: any, file: UploadFile) => {
     if (res.code === 200) {
-        uploadList.value.push({ filename: res.data.filename, filepath: res.data.filepath, filetype: res.data.filetype });
+        uploadList.value.push({ filename: res.data.fileName, filepath: res.data.url, ossId: res.data.ossId });
         // console.log(uploadList.value)
         // proxy?.$emit("upload-success", uploadList.value);
+        console.log(res)
         uploadedSuccessfully();
     } else {
         number.value--;
         proxy?.$modal.closeLoading();
         proxy?.$modal.msgError(res.msg);
         fileUploadRef.value?.handleRemove(file);
+      
         uploadedSuccessfully();
     }
 }

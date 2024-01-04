@@ -44,17 +44,18 @@
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="id" align="center" prop="id" v-if="true" />
         <!-- <el-table-column label="房源id" align="center" prop="houseid" /> -->
-        <el-table-column label="原始名称" align="center" prop="name" />
+        <el-table-column label="原始名称" align="center" prop="ossInfo.originalName" />
 
         <el-table-column label="保存路径" align="center" prop="path">
-          <template slot-scope="scope">
-            <el-image :src ="scope.value.path" min-width="70" height="70" />
+          <template #default="scope">
+            <el-image v-if="scope.row.htype==0" :src="scope.row.ossInfo.url" min-width="70" height="70" />
+            <span v-text="scope.row.ossInfo.url" v-if="scope.row.htype==1" />
           </template>
         </el-table-column>
         <el-table-column label="文件类型" align="center" prop="htype">
-          <!-- <template #default="scope">
+          <template #default="scope">
             <dict-tag :options="lvju_housefile_type" :value="scope.row.htype" />
-          </template> -->
+          </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="createTime" width="180">
           <template #default="scope">
@@ -78,16 +79,7 @@
     <!-- 添加或修改房源附件信息对话框 -->
     <el-dialog :title="dialog.title" v-model="dialog.visible" width="500px" append-to-body>
       <el-form ref="hattchFormRef" :model="form" :rules="rules" label-width="80px">
-        <!-- <el-form-item label="房源id" prop="houseid">
-          <el-input v-model="form.houseid" placeholder="请输入房源id" />
-        </el-form-item> -->
-        <!-- <el-form-item label="原始名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入原始名称" />
-        </el-form-item> -->
         <el-form-item label="保存路径" prop="path">
-          <!-- <file-upload v-model="form.path" /> -->
-          <!-- <upload-file v-model="form.path"></upload-file> -->
-          <!-- <fileUpload v-model="form.path" fileType="['jpg', 'png', 'gif']" fileSize="5" action="http://localhost:8080/upload" /> -->
           <file-upload
             v-model="form.path"
             :disabled="true"
@@ -98,6 +90,7 @@
             :fileType='["jpg", "png", "jpeg", "txt", "pdf"]'
             :isShowTip="true"
           />
+          <!-- 此时在前端配置的上传路径 会被组件中设置的默认地址覆盖 文件全部上传到oos服务商 -->
         </el-form-item>
         <el-form-item label="文件类型" prop="htype">
           <el-select v-model="form.htype" placeholder="请选择文件类型">
@@ -133,6 +126,7 @@ const houseid = ref(0);
 const fileList = ref<any[]>([]);
 const queryFormRef = ref<ElFormInstance>();
 const hattchFormRef = ref<ElFormInstance>();
+const baseUrl = import.meta.env.VITE_APP_BASE_API;
 
 const dialog = reactive<DialogOption>({
   visible: false,
@@ -143,10 +137,8 @@ import { propTypes } from '@/utils/propTypes';
 const initFormData: HattchForm = {
   id: undefined,
   houseid: undefined,
-  name: undefined,
-  path: undefined,
-  htype: undefined,
-  oldPath: undefined
+  ossId: undefined,
+  htype: undefined
 };
 const data = reactive<PageData<HattchForm, HattchQuery>>({
   form: { ...initFormData },
@@ -154,14 +146,10 @@ const data = reactive<PageData<HattchForm, HattchQuery>>({
     pageNum: 1,
     pageSize: 10,
     houseid: undefined,
-    name: undefined,
-    path: undefined,
     htype: undefined,
     params: {}
   },
   rules: {
-    name: [{ required: true, message: '原始名称不能为空', trigger: 'blur' }],
-    path: [{ required: true, message: '保存路径不能为空', trigger: 'blur' }],
     htype: [{ required: true, message: '文件类型', trigger: 'change' }]
   }
 });
@@ -229,7 +217,7 @@ const handleUpdate = async (row?: HattchVO) => {
   const _id = row?.id || ids.value[0];
   const res = await getHattch(_id);
   Object.assign(form.value, res.data);
-  form.value.oldPath = form.value.path;
+
   dialog.visible = true;
   dialog.title = '修改房源附件信息';
 };
@@ -239,9 +227,9 @@ const submitForm = () => {
   if (form.value.id) {
     /* 修改 */
     if (fileList.value.length != 0) {
-      form.value.name = fileList.value[0].filename;
-      form.value.path = fileList.value[0].filepath;
-      // form.value.htype = fileList.value[0].filetype;
+      // form.value.name = fileList.value[0].filename;
+      // form.value.path = fileList.value[0].filepath;
+      form.value.ossId = fileList.value[0].ossId;
       form.value.houseid = houseid.value;
     }
     hattchFormRef.value?.validate(async (valid: boolean) => {
@@ -260,15 +248,15 @@ const submitForm = () => {
       proxy?.$modal.msgError('请先上传文件');
       return;
     }
-    form.value.name = fileList.value[0].filename;
-    form.value.path = fileList.value[0].filepath;
-    // form.value.htype = fileList.value[0].filetype;
+    // form.value.name = fileList.value[0].filename;
+    // form.value.path = fileList.value[0].filepath;
+    form.value.ossId = fileList.value[0].ossId;
     form.value.houseid = houseid.value;
     hattchFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {
         buttonLoading.value = true;
         await addHattch(form.value).finally(() => (buttonLoading.value = false));
-        proxy?.$modal.msgSuccess('修改成功');
+        proxy?.$modal.msgSuccess('上传成功');
         dialog.visible = false;
         await getList();
       }
