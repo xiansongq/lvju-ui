@@ -34,6 +34,10 @@ export interface SupplierVO {
    */
   stype: number;
 
+  /* 1 法人 2 个人 */
+
+  agentType: string;
+
   /**
    * 创建时间
    */
@@ -77,6 +81,10 @@ export interface SupplierForm extends BaseEntity {
    */
   stype?: number;
 
+    /* 1 法人 2 个人 */
+
+    agentType: string | number;
+
 }
 
 export interface SupplierQuery extends PageQuery {
@@ -115,6 +123,10 @@ export interface SupplierQuery extends PageQuery {
      * 日期范围参数
      */
     params?: any;
+
+    /* 1 法人 2 个人 */
+
+  agentType: string | number;
 }
 
 

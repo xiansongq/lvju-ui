@@ -167,8 +167,7 @@ const getList = async () => {
 
 /* 上传文件成功响应 */
 const uploadedSuccessfully = (res) => {
-  console.log('123');
-  console.log(res);
+
   fileList.value = res;
 };
 

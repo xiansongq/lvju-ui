@@ -10,29 +10,29 @@ export interface SupattchVO {
   userid: string | number;
 
   /**
-   * 附件编号
+   * ossId
    */
-  supplierid: string | number;
+  ossId: string | number;
 
   /**
-   * 附件名称
+   * 文件名称
    */
-  name: string;
+  typeName: string;
 
   /**
-   * 文件路径
+   * 文件类型值
    */
-  path: string;
-
-  /**
-   * 文件类型/多种类型存放在字典
-   */
-  stype: number;
+  typeValue: number;
 
   /**
    * 是否删除
    */
   ideleted: string | number;
+
+  /**
+   * 创建时间
+   */
+  createTime: string;
 
 }
 
@@ -48,29 +48,27 @@ export interface SupattchForm extends BaseEntity {
   userid?: string | number;
 
   /**
-   * 附件编号
+   * ossId
    */
-  supplierid?: string | number;
+  ossId?: string | number;
 
   /**
-   * 附件名称
+   * 文件名称
    */
-  name?: string;
+  typeName?: string;
 
   /**
-   * 文件路径
+   * 文件类型值
    */
-  path?: string;
-
-  /**
-   * 文件类型/多种类型存放在字典
-   */
-  stype?: number;
+  typeValue?: number;
 
   /**
    * 是否删除
    */
   ideleted?: string | number;
+
+  /* 法人还是个人 */
+  peopleType?: string| number;
 
 }
 
@@ -82,24 +80,19 @@ export interface SupattchQuery extends PageQuery {
   userid?: string | number;
 
   /**
-   * 附件编号
+   * ossId
    */
-  supplierid?: string | number;
+  ossId?: string | number;
 
   /**
-   * 附件名称
+   * 文件名称
    */
-  name?: string;
+  typeName?: string;
 
   /**
-   * 文件路径
+   * 文件类型值
    */
-  path?: string;
-
-  /**
-   * 文件类型/多种类型存放在字典
-   */
-  stype?: number;
+  typeValue?: number;
 
   /**
    * 是否删除
@@ -110,7 +103,18 @@ export interface SupattchQuery extends PageQuery {
      * 日期范围参数
      */
     params?: any;
+      /* 法人还是个人 */
+  peopleType?: string| number;
 }
 
+export interface InfoVo {
+  id?:string|number;
+   typeName?: string;
+   typeValue?: string|number;
+   status?: string | number;
+   ossId?: string|number;
+   createTime?: string|number;
+   ideleted?: string | number;
+}
 
 

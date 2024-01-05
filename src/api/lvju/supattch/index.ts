@@ -16,6 +16,14 @@ export const listSupattch = (query?: SupattchQuery): AxiosPromise<SupattchVO[]> 
   });
 };
 
+export const allSupattch = (query?: SupattchQuery): AxiosPromise<SupattchVO[]> => {
+  return request({
+    url: '/lvju/supattch/all',
+    method: 'get',
+    params: query
+  });
+};
+
 /**
  * 查询供应商资质证明材料详细
  * @param id
@@ -61,16 +69,3 @@ export const delSupattch = (id: string | number | Array<string | number>) => {
     method: 'delete'
   });
 };
-
-/* 
-* 根据userid 查询list数据
-* @param userid
-*/
-
-export const getByuserid = (userid: string |number )=>{
-  return request({
-    url:'lvju/supattch/'+userid,
-    method:'get'
-  });
-};
-

@@ -6,17 +6,8 @@
           <el-form-item label="名称" prop="name">
             <el-input v-model="queryParams.name" placeholder="请输入名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
-          <el-form-item label="城市" prop="cityid">
-            <el-input v-model="queryParams.cityid" placeholder="请输入城市" clearable style="width: 240px" @keyup.enter="handleQuery" />
-          </el-form-item>
-          <el-form-item label="经度" prop="logtude">
-            <el-input v-model="queryParams.logtude" placeholder="请输入经度" clearable style="width: 240px" @keyup.enter="handleQuery" />
-          </el-form-item>
-          <el-form-item label="纬度" prop="lattude">
-            <el-input v-model="queryParams.lattude" placeholder="请输入纬度" clearable style="width: 240px" @keyup.enter="handleQuery" />
-          </el-form-item>
-          <el-form-item label="创建时间" prop="createTime">
-            <el-date-picker clearable v-model="queryParams.createTime" type="date" value-format="YYYY-MM-DD" placeholder="请选择创建时间" />
+          <el-form-item label="城市名" prop="cityname">
+            <el-input v-model="queryParams.cityname" placeholder="请输入城市" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -141,6 +132,8 @@ const initFormData: EstateForm = {
   id: undefined,
   name: undefined,
   cityid: undefined,
+  cityname: undefined,
+
   logtude: undefined,
   lattude: undefined,
   describe: undefined,
@@ -153,6 +146,7 @@ const data = reactive<PageData<EstateForm, EstateQuery>>({
     pageSize: 10,
     name: undefined,
     cityid: undefined,
+    cityname: undefined,
     logtude: undefined,
     lattude: undefined,
     createTime: undefined,
@@ -171,39 +165,31 @@ const data = reactive<PageData<EstateForm, EstateQuery>>({
 
 const { queryParams, form, rules } = toRefs(data);
 
-const getCityName =(cityId?:string | number)=>{
-  for(var i=0;i<citylist.value.length;i++){
+// const getCityName =(cityId?:string | number)=>{
+//   for(var i=0;i<citylist.value.length;i++){
 
-    if(citylist.value[i].id===cityId){
-      return citylist.value[i].name;
-    }
-  }
-}
+//     if(citylist.value[i].id===cityId){
+//       return citylist.value[i].name;
+//     }
+//   }
+// }
 
 /** 查询小区信息操作列表 */
 const getList = async () => {
   loading.value = true;
   const res = await listEstate(queryParams.value);
   estateList.value = res.rows;
-  //将对应的城市编号转为 城市名称  这是一种比较慢的方法 最后还是需要在后端表连接查询的\
-  for(var i=0;i<res.rows.length;i++){
-   
-    const name=getCityName(res.rows[i].cityid);
-    estateList.value[i].cityname=name;
-    
-  }
   total.value = res.total;
   loading.value = false;
 };
 
 /* 查看所属小区的房源 */
-const handleShowHouse = async(row?: EstateVO)=>{
-    // 获取小区id
-    var estateid=row?.id;
-    // 跳转
-    proxy?.$router.push({path:'/houselist',query:{estateid:estateid,name:row?.name,cityid:row?.cityid}});
-
-}
+const handleShowHouse = async (row?: EstateVO) => {
+  // 获取小区id
+  var estateid = row?.id;
+  // 跳转
+  proxy?.$router.push({ path: '/houselist', query: { estateid: estateid, name: row?.name, cityid: row?.cityid } });
+};
 
 /** 取消按钮 */
 const cancel = () => {
@@ -228,6 +214,17 @@ const reset = () => {
 /** 搜索按钮操作 */
 const handleQuery = () => {
   queryParams.value.pageNum = 1;
+  // 将其中的 cityname 转为对应的cityid
+  if (queryParams.value.cityname != null) {
+    for (var i = 0; i < citylist.value.length; i++) {
+      if (citylist.value[i].name == queryParams.value.cityname) queryParams.value.cityid = citylist.value[i].id;
+    }
+  }
+  if (queryParams.value.cityid === undefined) {
+    proxy?.$modal.alertWarning('当前城市未开通！');
+    return;
+  }
+  console.log(queryParams.value);
   getList();
 };
 

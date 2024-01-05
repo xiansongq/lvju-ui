@@ -3,17 +3,8 @@
     <transition :enter-active-class="proxy?.animate.searchAnimate.enter" :leave-active-class="proxy?.animate.searchAnimate.leave">
       <div class="search" v-show="showSearch">
         <el-form :model="queryParams" ref="queryFormRef" :inline="true" label-width="68px">
-          <el-form-item label="用户编号" prop="userid">
-            <el-input v-model="queryParams.userid" placeholder="请输入用户编号" clearable style="width: 240px" @keyup.enter="handleQuery" />
-          </el-form-item>
           <el-form-item label="公司名称" prop="company">
             <el-input v-model="queryParams.company" placeholder="请输入公司名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
-          </el-form-item>
-          <el-form-item label="联系人" prop="name">
-            <el-input v-model="queryParams.name" placeholder="请输入联系人" clearable style="width: 240px" @keyup.enter="handleQuery" />
-          </el-form-item>
-          <el-form-item label="身份证号" prop="sdnum">
-            <el-input v-model="queryParams.sdnum" placeholder="请输入身份证号" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
           <el-form-item label="联系电话" prop="iphone">
             <el-input v-model="queryParams.iphone" placeholder="请输入联系电话" clearable style="width: 240px" @keyup.enter="handleQuery" />
@@ -21,6 +12,11 @@
           <el-form-item label="类型" prop="stype">
             <el-select v-model="queryParams.stype" placeholder="请选择类型" clearable>
               <el-option v-for="dict in lvju_supplier_type" :key="dict.value" :label="dict.label" :value="dict.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="用户类型" prop="agentType">
+            <el-select v-model="queryParams.agentType" placeholder="请选择类型" clearable>
+              <el-option v-for="dict in lvju_agent_type" :key="dict.value" :label="dict.label" :value="dict.value" />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -56,8 +52,8 @@
 
       <el-table v-loading="loading" :data="supplierList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="id" align="center" prop="id" v-if="true" />
-        <el-table-column label="用户编号" align="center" prop="userid" />
+        <!-- <el-table-column label="id" align="center" prop="id" v-if="true" /> -->
+        <!-- <el-table-column label="用户编号" align="center" prop="userid" /> -->
         <el-table-column label="公司名称" align="center" prop="company" />
         <el-table-column label="联系人" align="center" prop="name" />
         <el-table-column label="身份证号" align="center" prop="sdnum" />
@@ -65,6 +61,11 @@
         <el-table-column label="类型" align="center" prop="stype">
           <template #default="scope">
             <dict-tag :options="lvju_supplier_type" :value="scope.row.stype" />
+          </template>
+        </el-table-column>
+        <el-table-column label="用户类型" align="center" prop="stype">
+          <template #default="scope">
+            <dict-tag :options="lvju_agent_type" :value="scope.row.agentType" />
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -112,6 +113,11 @@
             <el-option v-for="dict in lvju_supplier_type" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="用户类型" prop="agentType">
+          <el-select v-model="form.agentType" placeholder="请选择类型">
+            <el-option v-for="dict in lvju_agent_type" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -130,6 +136,7 @@ import { ElMessage } from 'element-plus';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 const { lvju_supplier_type } = toRefs<any>(proxy?.useDict('lvju_supplier_type'));
+const { lvju_agent_type } = toRefs<any>(proxy?.useDict('lvju_agent_type'));
 
 const supplierList = ref<SupplierVO[]>([]);
 const buttonLoading = ref(false);
@@ -155,7 +162,8 @@ const initFormData: SupplierForm = {
   name: undefined,
   sdnum: undefined,
   iphone: undefined,
-  stype: undefined
+  stype: undefined,
+  agentType: undefined
 };
 const data = reactive<PageData<SupplierForm, SupplierQuery>>({
   form: { ...initFormData },
@@ -168,16 +176,18 @@ const data = reactive<PageData<SupplierForm, SupplierQuery>>({
     sdnum: undefined,
     iphone: undefined,
     stype: undefined,
+    agentType: undefined,
     params: {}
   },
   rules: {
-    id: [{ required: true, message: 'id不能为空', trigger: 'blur' }],
+    // id: [{ required: true, message: 'id不能为空', trigger: 'blur' }],
     userid: [{ required: true, message: '用户编号不能为空', trigger: 'blur' }],
     company: [{ required: true, message: '公司名称不能为空', trigger: 'blur' }],
     name: [{ required: true, message: '联系人不能为空', trigger: 'blur' }],
     sdnum: [{ required: true, message: '身份证号不能为空', trigger: 'blur' }],
     iphone: [{ required: true, message: '联系电话不能为空', trigger: 'blur' }],
-    stype: [{ required: true, message: '1：供应商 2：代理商 3：个人不能为空', trigger: 'change' }]
+    stype: [{ required: true, message: '1：供应商 2：代理商 3：个人不能为空', trigger: 'change' }],
+    agentType: [{ required: true, message: '用户类型不能为空', trigger: 'change' }]
   }
 });
 
@@ -266,7 +276,7 @@ const handleShowFile = async (row?: SupplierVO) => {
     return;
   }
 
-  proxy?.$router.push({ path: 'filetable', query: { type: type, userid: userid } });
+  proxy?.$router.push({ path: '/fileshow', query: { stype: type, userid: userid,agentType:row?.agentType } });
 };
 
 /** 删除按钮操作 */

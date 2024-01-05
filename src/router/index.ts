@@ -123,6 +123,12 @@ export const constantRoutes: RouteOption[] = [
         component:()=>import('@/views/lvju/hattch/index.vue'),
         name:'housefile',
         meta:{ title: '房源附件' ,icon:'file'}
+      },
+      {
+        path:"/fileshow",
+        component:()=>import('@/views/lvju/supplier/filetable.vue'),
+        name:'supplierfile',
+        meta:{ title: '供应商附件' ,icon:'file'}
       }
     ]
   }

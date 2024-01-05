@@ -61,9 +61,9 @@
 
       <el-table v-loading="loading" :data="houseList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="id" align="center" prop="id" v-if="true" />
-        <el-table-column label="用户编号" align="center" prop="userid" />
-        <el-table-column label="供应商编号" align="center" prop="supplierid" />
+        <!-- <el-table-column label="id" align="center" prop="id" v-if="true" /> -->
+        <!-- <el-table-column label="用户编号" align="center" prop="userid" /> -->
+        <!-- <el-table-column label="供应商编号" align="center" prop="supplierid" /> -->
         <el-table-column label="名称" align="center" prop="name" />
         <el-table-column label="城市" align="center" prop="cityname" />
         <el-table-column label="小区" align="center" prop="estatename" />
@@ -136,14 +136,14 @@
     </el-dialog>
 
     <!-- 查看详细信息对话框 -->
-    <el-dialog :title="infolog.title" v-model="infolog.visible" width="700px"  append-to-body>
+    <el-dialog :title="infolog.title" v-model="infolog.visible" width="700px" append-to-body>
       <el-descriptions title="房源信息" :model="houseInfo" column="2" border>
-        <el-descriptions-item label="编号" >{{ houseInfo?.id }}  </el-descriptions-item>
+        <el-descriptions-item label="编号">{{ houseInfo?.id }} </el-descriptions-item>
         <el-descriptions-item label="用户id">{{ houseInfo?.userid }}</el-descriptions-item>
         <el-descriptions-item label="供应商id">{{houseInfo?.supplierid}}</el-descriptions-item>
         <el-descriptions-item label="城市">{{houseInfo?.cityname}}</el-descriptions-item>
         <el-descriptions-item label="小区">{{houseInfo?.estatename}}</el-descriptions-item>
-        
+
         <el-descriptions-item label="数量">
           <el-tag size="small">{{houseInfo?.num}}</el-tag>
         </el-descriptions-item>
@@ -178,7 +178,7 @@ const cityID = ref(0);
 const queryFormRef = ref<ElFormInstance>();
 const houseFormRef = ref<ElFormInstance>();
 const estatename = ref('');
-const houseInfo= ref<HouseVO>();
+const houseInfo = ref<HouseVO>();
 
 const dialog = reactive<DialogOption>({
   visible: false,
@@ -265,12 +265,11 @@ const getList = async () => {
   loading.value = true;
   const res = await listHouse(queryParams.value);
   houseList.value = res.rows;
-  //将对应的城市编号转为 城市名称  这是一种比较慢的方法 最后还是需要在后端表连接查询的\
-  for (var i = 0; i < res.rows.length; i++) {
-    const name = getCityName(res.rows[i].cityid);
-    houseList.value[i].cityname = name;
-    houseList.value[i].estatename = estatename.value;
-  }
+  console.log(res.rows)
+  estateid.value=res.rows[0].estateid;
+  cityID.value=res.rows[0].cityid;
+  console.log(estateid.value);
+  console.log(cityID.value);
   total.value = res.total;
   loading.value = false;
 };
@@ -312,6 +311,7 @@ const handleAdd = () => {
   /* 先设置默认值 */
   form.value.estateid = estateid.value;
   form.value.cityid = cityID.value;
+  form.value.id="";
   dialog.visible = true;
   dialog.title = '添加房源信息表';
 };
@@ -328,7 +328,7 @@ const handleUpdate = async (row?: HouseVO) => {
 
 /** 提交按钮 */
 const submitForm = () => {
-
+  console.log(form.value);
   houseFormRef.value?.validate(async (valid: boolean) => {
     if (valid) {
       buttonLoading.value = true;
@@ -354,11 +354,10 @@ const handleDelete = async (row?: HouseVO) => {
 };
 
 /* 管理附件按钮 */
-const handleMangFile =async (row?:HouseVO)=>{
+const handleMangFile = async (row?: HouseVO) => {
   // 携带房间id 跳转到新的页面
-  const _ids=row?.id;
-  proxy?.$router.push({path:"/housefile",query:{id:_ids}});
-
+  const _ids = row?.id;
+  proxy?.$router.push({ path: '/housefile', query: { id: _ids } });
 };
 
 /** 导出按钮操作 */
@@ -376,10 +375,10 @@ import { useRouter } from 'vue-router';
 onMounted(() => {
   var id = proxy?.$router.currentRoute.value.query.estateid;
   queryParams.value.estateid = id;
-  estateid.value = id;
-  estatename.value = proxy?.$router.currentRoute.value.query.name;
-  cityID.value = proxy?.$router.currentRoute.value.query.cityid;
-  getCityList();
+  // estateid.value = id;
+  // estatename.value = proxy?.$router.currentRoute.value.query.name;
+  // cityID.value = proxy?.$router.currentRoute.value.query.cityid;
+  // getCityList();
   getList();
 });
 </script>

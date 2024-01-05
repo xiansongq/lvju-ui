@@ -3,15 +3,9 @@
     <transition :enter-active-class="proxy?.animate.searchAnimate.enter" :leave-active-class="proxy?.animate.searchAnimate.leave">
       <div class="search" v-show="showSearch">
         <el-form :model="queryParams" ref="queryFormRef" :inline="true" label-width="68px">
-          <el-form-item label="房源id" prop="houseid">
-            <el-input v-model="queryParams.houseid" placeholder="请输入房源id" clearable style="width: 240px" @keyup.enter="handleQuery" />
-          </el-form-item>
 
           <el-form-item label="楼层" prop="houselv">
             <el-input v-model="queryParams.houselv" placeholder="请输入楼层" clearable style="width: 240px" @keyup.enter="handleQuery" />
-          </el-form-item>
-          <el-form-item label="房号" prop="roomno">
-            <el-input v-model="queryParams.roomno" placeholder="请输入房号" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
           <el-form-item label="房型" prop="apartment">
             <el-input v-model="queryParams.apartment" placeholder="请输入房型" clearable style="width: 240px" @keyup.enter="handleQuery" />
