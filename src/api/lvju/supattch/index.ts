@@ -1,7 +1,18 @@
 import request from '@/utils/request';
 import { AxiosPromise } from 'axios';
-import { SupattchVO, SupattchForm, SupattchQuery } from '@/api/lvju/supattch/types';
+import { SupattchVO, SupattchForm, SupattchQuery,InfoVo } from '@/api/lvju/supattch/types';
 
+/**
+ * 删除供应商资质证明材料
+ * @param data
+ */
+export const deleteFunction = (data: InfoVo) => {
+  return request({
+    url: '/lvju/supattch/delete',
+    method: 'put',
+    data: data
+  });
+};
 /**
  * 查询供应商资质证明材料列表
  * @param query
