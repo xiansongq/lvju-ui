@@ -1,16 +1,18 @@
+
+<!-- 页面渲染中有一些问题 暂时还没有排除 -->
 <template>
   <!-- 个人供应商 -->
-  <div v-if="agentType==2">
+  <div v-if="agentType==2" class="p-2">
     <!-- <span>个人</span> -->
     <div v-if="stype==1">
       <!-- <span>供应商</span> -->
       <el-card>
-        <template #header>
+        <!-- <template >
           <el-row :gutter="10" class="mb8">
             <el-col :span="1.5"> </el-col>
             <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
           </el-row>
-        </template>
+        </template> -->
         <el-table :data="supattchList">
           <el-table-column label="文件名称" align="center" prop="typeName">
             <!-- <span v-for="(item, index) in lvju_file_type" :key="index">
@@ -44,12 +46,12 @@
       <!-- <p>代理商</p> -->
 
       <el-card>
-        <template #header>
+        <!-- <template #header>
           <el-row :gutter="10" class="mb8">
             <el-col :span="1.5"> </el-col>
             <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
           </el-row>
-        </template>
+        </template> -->
         <el-table :data="supattchList">
           <el-table-column label="文件名称" align="center" prop="typeName">
             <!-- <span v-for="(item, index) in lvju_file_type" :key="index">
@@ -222,39 +224,6 @@ const data = reactive<PageData<SupattchForm, SupattchQuery>>({
 });
 const { queryParams, form, rules } = toRefs(data);
 
-/* 处理个人文件列表 */
-const opagentp = () => {
-  /* 字典数据 因为类型是 ObjectRefImpl 所以只有通过监听变化的方式才能 */
-  watch(lvju_file_type, (newVal: ObjectRefImpl) => {
-    for (var i = 0; i < newVal.length; i++) {
-      /* 添加数据 */
-      agentpList.value.push({
-        typeName: newVal[i].label,
-        typeValue: newVal[i].value,
-        status: '',
-        ossId: '',
-        createTime: ''
-      });
-    }
-  });
-  /* 做文件的匹配 */
-  for (var i = 0; i < agentpList.value.length; i++) {
-    var flag = 0;
-    for (var j = 0; j < supattchList.value.length; j++) {
-      if (agentpList.value[i].typeValue === supattchList.value[j].typeValue) {
-        agentpList.value[i].status = 1;
-        agentpList.value[i].ossId = supattchList.value[j].ossId;
-        agentpList.value[i].createTime = supattchList.value[j].createTime;
-        flag = 1;
-      }
-    }
-
-    if (flag == 0) agentpList.value[i].status = 0;
-  }
-
-  //
-};
-
 /** 查询供应商资质证明材料列表 */
 const getList = async () => {
   loading.value = true;
@@ -304,6 +273,5 @@ onMounted(async () => {
   queryParams.value.userid = userid.value;
   queryParams.value.peopleType = agentType.value;
   getList();
-  //   opagentp();
 });
 </script>

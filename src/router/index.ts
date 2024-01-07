@@ -62,6 +62,8 @@ export const constantRoutes: RouteOption[] = [
     component: () => import('@/views/error/401.vue'),
     hidden: true
   },
+
+ 
   {
     path: '',
     component: Layout,
@@ -71,7 +73,7 @@ export const constantRoutes: RouteOption[] = [
         path: '/index',
         component: () => import('@/views/index.vue'),
         name: 'Index',
-        meta: { title: '首页', icon: 'dashboard', affix: true }
+        meta: { title: '首页', icon: 'dashboard' }
       }
     ]
   },
@@ -89,28 +91,13 @@ export const constantRoutes: RouteOption[] = [
       }
     ]
   },
+
+ /* 后续需要根据菜单权限配置到动态路由中 */
   {
     path:'',
     component: Layout,
     hidden: true,
     redirect: 'noredirect',
-    children: [
-      {
-        path:'lvju/filetable',
-        component: ()=> import('@/views/lvju/supattch/filetable.vue'),
-        name: 'filetable',
-        meta:{ title: '文件列表' ,icon:'file'}
-      }
-    ]
-  },
-  {
-    path:'',
-    // component:()=>import('@/views/lvju/house/index.vue'),
-    component: Layout,
-    // name: 'estatehouse',
-    // meta:{ title: '房源列表',icons:'house'},
-    hidden: true,
-    redirectTo: 'noredirect',
     children: [
       {
         path:'/houselist',
@@ -128,7 +115,7 @@ export const constantRoutes: RouteOption[] = [
         path:"/fileshow",
         component:()=>import('@/views/lvju/supplier/filetable.vue'),
         name:'supplierfile',
-        meta:{ title: '供应商附件' ,icon:'file'}
+        meta:{ title: '供应商附件' ,icon:'file',breadcrumb: true,}
       }
     ]
   }
@@ -207,7 +194,22 @@ export const dynamicRoutes: RouteOption[] = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen', icon: '' }
       }
     ]
-  }
+  },
+  // {
+  //   path: '/lvju/fileshow',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   permissions: ['tool:gen:edit'],
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component:()=>import('@/views/lvju/supplier/filetable.vue'),
+  //       name: 'fileshow',
+  //       meta: { title: '文件列表', icon: 'dashboard', activeMenu: '/lvju/supplier' }
+  //     }
+  //   ]
+  // },
+
 ];
 
 /**

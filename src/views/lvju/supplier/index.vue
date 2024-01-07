@@ -133,7 +133,7 @@
 import { listSupplier, getSupplier, delSupplier, addSupplier, updateSupplier } from '@/api/lvju/supplier';
 import { SupplierVO, SupplierQuery, SupplierForm } from '@/api/lvju/supplier/types';
 import { ElMessage } from 'element-plus';
-
+const router = useRouter();
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 const { lvju_supplier_type } = toRefs<any>(proxy?.useDict('lvju_supplier_type'));
 const { lvju_agent_type } = toRefs<any>(proxy?.useDict('lvju_agent_type'));
@@ -276,7 +276,7 @@ const handleShowFile = async (row?: SupplierVO) => {
     return;
   }
 
-  proxy?.$router.push({ path: '/fileshow', query: { stype: type, userid: userid,agentType:row?.agentType } });
+  router.push({ path: '/fileshow', query: { stype: type, userid: userid,agentType:row?.agentType } });
 };
 
 /** 删除按钮操作 */

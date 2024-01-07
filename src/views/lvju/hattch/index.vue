@@ -81,7 +81,7 @@
       <el-form ref="hattchFormRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="保存路径" prop="path">
           <file-upload
-            v-model="form.path"
+            v-model="form.ossId"
             :disabled="true"
             @upload-success="uploadedSuccessfully"
             :uploadUrl="'/lvju/file/upload'"
@@ -123,7 +123,7 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const houseid = ref(0);
-const fileList = ref<any[]>([]);
+const fileInfo = ref<any[]>([]);
 const queryFormRef = ref<ElFormInstance>();
 const hattchFormRef = ref<ElFormInstance>();
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
@@ -167,8 +167,7 @@ const getList = async () => {
 
 /* 上传文件成功响应 */
 const uploadedSuccessfully = (res) => {
-
-  fileList.value = res;
+  fileInfo.value = res;
 };
 
 /** 取消按钮 */
@@ -225,10 +224,10 @@ const handleUpdate = async (row?: HattchVO) => {
 const submitForm = () => {
   if (form.value.id) {
     /* 修改 */
-    if (fileList.value.length != 0) {
+    if (fileInfo.value.length != 0) {
       // form.value.name = fileList.value[0].filename;
       // form.value.path = fileList.value[0].filepath;
-      form.value.ossId = fileList.value[0].ossId;
+      form.value.ossId = fileInfo.value[0].ossId;
       form.value.houseid = houseid.value;
     }
     hattchFormRef.value?.validate(async (valid: boolean) => {
@@ -243,13 +242,13 @@ const submitForm = () => {
     });
   } else {
     /* 添加 ，必须上传文件*/
-    if (fileList.value.length == 0) {
+    if (fileInfo.value.length == 0) {
       proxy?.$modal.msgError('请先上传文件');
       return;
     }
     // form.value.name = fileList.value[0].filename;
     // form.value.path = fileList.value[0].filepath;
-    form.value.ossId = fileList.value[0].ossId;
+    form.value.ossId = fileInfo.value[0].ossId;
     form.value.houseid = houseid.value;
     hattchFormRef.value?.validate(async (valid: boolean) => {
       if (valid) {

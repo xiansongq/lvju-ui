@@ -43,22 +43,22 @@
 </template>
 
 <script setup lang="ts">
-import { listByIds, delOss } from "@/api/system/oss";
+import { listByIds, delOss } from '@/api/system/oss';
 import { propTypes } from '@/utils/propTypes';
-import { globalHeaders } from "@/utils/request";
+import { globalHeaders } from '@/utils/request';
 
 const props = defineProps({
-    modelValue: [String, Object, Array],
-    // 数量限制
-    limit: propTypes.number.def(5),
-    // 大小限制(MB)
-    fileSize: propTypes.number.def(5),
-    // 文件类型, 例如['png', 'jpg', 'jpeg']
-    fileType: propTypes.array.def(["doc", "xls", "ppt", "txt", "pdf"]),
-    // 是否显示提示
-    isShowTip: propTypes.bool.def(true),
-    // 文件上传路径
-    uploadUrl: propTypes.string.def(""),
+  modelValue: [String, Object, Array],
+  // 数量限制
+  limit: propTypes.number.def(5),
+  // 大小限制(MB)
+  fileSize: propTypes.number.def(5),
+  // 文件类型, 例如['png', 'jpg', 'jpeg']
+  fileType: propTypes.array.def(['doc', 'xls', 'ppt', 'txt', 'pdf']),
+  // 是否显示提示
+  isShowTip: propTypes.bool.def(true),
+  // 文件上传路径
+  uploadUrl: propTypes.string.def('')
 });
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
@@ -67,161 +67,174 @@ const number = ref(0);
 const uploadList = ref<any[]>([]);
 
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
-const uploadFileUrl = ref(baseUrl + "/resource/oss/upload"); // 上传文件服务器地址
+const uploadFileUrl = ref(baseUrl + '/resource/oss/upload'); // 上传文件服务器地址
 const headers = ref(globalHeaders());
 
 const fileList = ref<any[]>([]);
-const showTip = computed(
-    () => props.isShowTip && (props.fileType || props.fileSize)
-);
+const showTip = computed(() => props.isShowTip && (props.fileType || props.fileSize));
 
 const fileUploadRef = ref<ElUploadInstance>();
 
-watch(() => props.modelValue, async val => {
+watch(
+  () => props.modelValue,
+  async (val) => {
     if (val) {
-        let temp = 1;
-        // 首先将值转为数组
-        let list = [];
-        if (Array.isArray(val)) {
-            list = val;
-        } else {
-            const res = await listByIds(val as string)
-            list = res.data.map((oss) => {
-                const data = { name: oss.originalName, url: oss.url, ossId: oss.ossId };
-                return data;
-            });
-        }
-        // 然后将数组转为对象数组
-        fileList.value = list.map(item => {
-            item = { name: item.name, url: item.url, ossId: item.ossId };
-            item.uid = item.uid || new Date().getTime() + temp++;
-            return item;
+      let temp = 1;
+      // 首先将值转为数组
+      let list = [];
+      if (Array.isArray(val)) {
+        list = val;
+      } else {
+        const res = await listByIds(val as string);
+        list = res.data.map((oss) => {
+          const data = { name: oss.originalName, url: oss.url, ossId: oss.ossId };
+          return data;
         });
+      }
+      // 然后将数组转为对象数组
+      fileList.value = list.map((item) => {
+        item = { name: item.name, url: item.url, ossId: item.ossId };
+        item.uid = item.uid || new Date().getTime() + temp++;
+        return item;
+      });
     } else {
-        fileList.value = [];
-        return [];
+      fileList.value = [];
+      return [];
     }
-    
-}, { deep: true, immediate: true });
+  },
+  { deep: true, immediate: true }
+);
 
 // 上传前校检格式和大小
 const handleBeforeUpload = (file: any) => {
-    console.log(uploadFileUrl)
-    // 校检文件类型
-    if (props.fileType.length) {
-        const fileName = file.name.split('.');
-        const fileExt = fileName[fileName.length - 1];
-        const isTypeOk = props.fileType.indexOf(fileExt) >= 0;
-        if (!isTypeOk) {
-            proxy?.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join("/")}格式文件!`);
-            return false;
-        }
+  // 校检文件类型
+  if (props.fileType.length) {
+    const fileName = file.name.split('.');
+    const fileExt = fileName[fileName.length - 1];
+    const isTypeOk = props.fileType.indexOf(fileExt) >= 0;
+    if (!isTypeOk) {
+      proxy?.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}格式文件!`);
+      return false;
     }
-    // 校检文件大小
-    if (props.fileSize) {
-        const isLt = file.size / 1024 / 1024 < props.fileSize;
-        if (!isLt) {
-            proxy?.$modal.msgError(`上传文件大小不能超过 ${props.fileSize} MB!`);
-            return false;
-        }
+  }
+  // 校检文件大小
+  if (props.fileSize) {
+    const isLt = file.size / 1024 / 1024 < props.fileSize;
+    if (!isLt) {
+      proxy?.$modal.msgError(`上传文件大小不能超过 ${props.fileSize} MB!`);
+      return false;
     }
-    proxy?.$modal.loading("正在上传文件，请稍候...");
-    number.value++;
-    return true;
-}
+  }
+  proxy?.$modal.loading('正在上传文件，请稍候...');
+  number.value++;
+  return true;
+};
 
 // 文件个数超出
 const handleExceed = () => {
-    proxy?.$modal.msgError(`上传文件数量不能超过 ${props.limit} 个!`);
-}
+  proxy?.$modal.msgError(`上传文件数量不能超过 ${props.limit} 个!`);
+};
 
 // 上传失败
 const handleUploadError = () => {
-    proxy?.$modal.msgError("上传文件失败");
-}
+  proxy?.$modal.msgError('上传文件失败');
+};
 
 // 上传成功回调
 const handleUploadSuccess = (res: any, file: UploadFile) => {
-    if (res.code === 200) {
-        uploadList.value.push({ filename: res.data.fileName, filepath: res.data.url, ossId: res.data.ossId });
-        // console.log(uploadList.value)
-        // proxy?.$emit("upload-success", uploadList.value);
-        console.log(res)
-        uploadedSuccessfully();
-    } else {
-        number.value--;
-        proxy?.$modal.closeLoading();
-        proxy?.$modal.msgError(res.msg);
-        fileUploadRef.value?.handleRemove(file);
-      
-        uploadedSuccessfully();
-    }
-}
+  if (res.code === 200) {
+    uploadList.value.push({ filename: res.data.fileName, filepath: res.data.url, ossId: res.data.ossId });
+    // console.log(uploadList.value)
+    // proxy?.$emit("upload-success", uploadList.value);
+    // console.log(res)
+    uploadedSuccessfully();
+  } else {
+    number.value--;
+    proxy?.$modal.closeLoading();
+    proxy?.$modal.msgError(res.msg);
+    fileUploadRef.value?.handleRemove(file);
+
+    uploadedSuccessfully();
+  }
+};
 
 // 删除文件
 const handleDelete = (index: number) => {
-    let ossId = fileList.value[index].ossId;
-    delOss(ossId);
-    fileList.value.splice(index, 1);
-    emit("update:modelValue", listToString(fileList.value));
-}
+  let ossId = fileList.value[index].ossId;
+  delOss(ossId);
+  fileList.value.splice(index, 1);
+  emit('update:modelValue', listToString(fileList.value));
+};
 
 // 上传结束处理
 const uploadedSuccessfully = () => {
-    if (number.value > 0 && uploadList.value.length === number.value) {
-        fileList.value = fileList.value.filter(f => f.url !== undefined).concat(uploadList.value);
-        uploadList.value = [];
-        number.value = 0;
-        console.log(fileList.value)
-        emit("update:modelValue", listToString(fileList.value));
-        proxy?.$emit("upload-success", fileList.value);
-        proxy?.$modal.closeLoading();
-    }
-}
+  if (number.value > 0 && uploadList.value.length === number.value) {
+    fileList.value = fileList.value.filter((f) => f.url !== undefined).concat(uploadList.value);
+    uploadList.value = [];
+    number.value = 0;
+    emit('update:modelValue', listToString(fileList.value));
+    proxy?.$emit('upload-success', fileList.value);
+    proxy?.$modal.closeLoading();
+  }
+};
 
 // 获取文件名称
 const getFileName = (name: string) => {
-    // 如果是url那么取最后的名字 如果不是直接返回
-    if (name.lastIndexOf("/") > -1) {
-        return name.slice(name.lastIndexOf("/") + 1);
-    } else {
-        return name;
-    }
-}
+  // 如果文件名以 / 结尾，则截取 / 后面的部分作为文件名称
+  if (name === undefined) {
+    return undefined;
+  }
+  if (name.lastIndexOf('/') > -1) {
+    return name.slice(name.lastIndexOf('/') + 1);
+  } else {
+    // 如果文件名不以 / 结尾，则直接返回文件名
+    return name;
+  }
+
+  // 检查 file 是否为 undefined
+  // 如果是，则直接返回 undefined
+
+  // 如果是url那么取最后的名字 如果不是直接返回
+  // if (name.lastIndexOf("/") > -1) {
+  //     return name.slice(name.lastIndexOf("/") + 1);
+  // } else {
+  //     return name;
+  // }
+};
 
 // 对象转成指定字符串分隔
 const listToString = (list: any[], separator?: string) => {
-    let strs = "";
-    separator = separator || ",";
-    list.forEach(item => {
-        if (item.ossId) {
-            strs += item.ossId + separator;
-        }
-    })
-    return strs != "" ? strs.substring(0, strs.length - 1) : "";
-}
+  let strs = '';
+  separator = separator || ',';
+  list.forEach((item) => {
+    if (item.ossId) {
+      strs += item.ossId + separator;
+    }
+  });
+  return strs != '' ? strs.substring(0, strs.length - 1) : '';
+};
 </script>
 
 <style scoped lang="scss">
 .upload-file-uploader {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .upload-file-list .el-upload-list__item {
-    border: 1px solid #e4e7ed;
-    line-height: 2;
-    margin-bottom: 10px;
-    position: relative;
+  border: 1px solid #e4e7ed;
+  line-height: 2;
+  margin-bottom: 10px;
+  position: relative;
 }
 
 .upload-file-list .ele-upload-list__item-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: inherit;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: inherit;
 }
 
 .ele-upload-list__item-content-action .el-link {
-    margin-right: 10px;
+  margin-right: 10px;
 }
 </style>
